@@ -35,11 +35,21 @@ static void localinit(JNIEnv * env) {
     }
 
     //	g_NumberClass = env->FindClass(JAVA_NUMBER);
+    //	#ifdef __ANDROID_API__
+    //	if (g_NumberClass == nullptr) {
+    //	g_NumberClass = findClass(env, JAVA_NUMBER);
+    //	}
+    //	#endif
     //	FATALIF(g_NumberClass == NULL, "Can't find Number class");
     //	g_NumberClass = (jclass) env->NewGlobalRef(g_NumberClass);
 
     // class: Integer
     g_IntegerClass = env->FindClass(JAVA_INTEGER);
+#ifdef __ANDROID_API__
+    if (g_IntegerClass == nullptr) {
+        g_IntegerClass = findClass(env, JAVA_INTEGER);
+    }
+#endif
     FATALIF(g_IntegerClass == NULL, "Can't find Integer class");
     g_IntegerClass = (jclass) env->NewGlobalRef(g_IntegerClass);
 
@@ -51,6 +61,11 @@ static void localinit(JNIEnv * env) {
 
     // class: Long
     g_LongClass = env->FindClass(JAVA_LONG);
+#ifdef __ANDROID_API__
+    if (g_LongClass == nullptr) {
+        g_LongClass = findClass(env, JAVA_LONG);
+    }
+#endif
     FATALIF(g_LongClass == NULL, "Can't find Long class");
     g_LongClass = (jclass) env->NewGlobalRef(g_LongClass);
     g_LongValueOf = env->GetStaticMethodID(g_LongClass, "valueOf", "(J)L" JAVA_LONG ";");
@@ -61,12 +76,22 @@ static void localinit(JNIEnv * env) {
 
     // class: Double
     g_DoubleClass = env->FindClass(JAVA_DOUBLE);
+#ifdef __ANDROID_API__
+    if (g_DoubleClass == nullptr) {
+        g_DoubleClass = findClass(env, JAVA_DOUBLE);
+    }
+#endif
     FATALIF(g_DoubleClass == NULL, "Can't find Double class");
     g_DoubleClass = (jclass) env->NewGlobalRef(g_DoubleClass);
     g_DoubleValueOf = env->GetStaticMethodID(g_DoubleClass, "valueOf", "(D)Ljava/lang/Double;");
     FATALIF(g_DoubleValueOf == NULL, "Can't find Double.valueOf() method");
 
     g_BooleanClass = env->FindClass(JAVA_BOOLEAN);
+#ifdef __ANDROID_API__
+    if (g_BooleanClass == nullptr) {
+        g_BooleanClass = findClass(env, JAVA_BOOLEAN);
+    }
+#endif
     FATALIF(g_BooleanClass == NULL, "Can't find Boolean class");
 
     g_BooleanClass = (jclass) env->NewGlobalRef(g_BooleanClass);
@@ -78,10 +103,20 @@ static void localinit(JNIEnv * env) {
 
     // class: String
     g_StringClass = env->FindClass(JAVA_STRING);
+#ifdef __ANDROID_API__
+    if (g_StringClass == nullptr) {
+        g_StringClass = findClass(env, JAVA_STRING);
+    }
+#endif
     FATALIF(g_StringClass == NULL, "Can't find String class");
     g_StringClass = (jclass) env->NewGlobalRef(g_StringClass);
 
     g_DateClass = env->FindClass("java/util/Date");
+#ifdef __ANDROID_API__
+    if (g_DateClass == nullptr) {
+        g_DateClass = findClass(env, "java/util/Date");
+    }
+#endif
     FATALIF(g_DateClass == NULL, "Can't find java.util.Date class");
     g_DateClass = (jclass) env->NewGlobalRef(g_DateClass);
 
@@ -190,8 +225,7 @@ jobject DoubleToObject(JNIEnv * env, double value) {
 jobject BSTRToObject(JNIEnv * env, BSTR value) {
     localinit(env);
 
-    CMyComBSTR str(value);
-    return env->NewString(UnicodeHelper(str), str.Length());
+    return ToJChar(value).toNewString(env);
 }
 
 /**
@@ -227,8 +261,9 @@ bool ObjectToFILETIME(JNIEnvInstance & jniEnvInstance, jobject obj, FILETIME & f
  */
 jstring PropVariantToString(JNIEnv * env, PROPID propID, const PROPVARIANT &propVariant) {
 
-    UString string = ConvertPropertyToString(propVariant, propID, true);
-    return env->NewString(UnicodeHelper(string), string.Length());
+    UString string;
+    ConvertPropertyToString(string, propVariant, propID, true);
+    return ToJChar(string).toNewString(env);
 }
 
 void ObjectToPropVariant(JNIEnvInstance & jniEnvInstance, jobject object, PROPVARIANT * propVariant) {
@@ -240,12 +275,7 @@ void ObjectToPropVariant(JNIEnvInstance & jniEnvInstance, jobject object, PROPVA
             jint value = jniEnvInstance->CallIntMethod(object, g_IntegerIntValue);
             cPropVariant = (Int32) value;
         } else if (jniEnvInstance->IsInstanceOf(object, g_StringClass)) {
-            const jchar * jChars = jniEnvInstance->GetStringChars((jstring) object, NULL);
-            //			BSTR bstr;
-            //	        StringToBstr(UnicodeHelper(jChars), &bstr);
-            //			cPropVariant = bstr;
-            cPropVariant = UString(UnicodeHelper(jChars, jniEnvInstance->GetStringLength((jstring) object)));
-            jniEnvInstance->ReleaseStringChars((jstring) object, jChars);
+            cPropVariant = UString(FromJChar(jniEnvInstance, (jstring)object));
         } else if (jniEnvInstance->IsInstanceOf(object, g_BooleanClass)) {
             jboolean value = jniEnvInstance->CallBooleanMethod(object, g_BooleanBooleanValue);
             cPropVariant = (bool) value;
@@ -290,6 +320,9 @@ jobject PropVariantToObject(JNIEnvInstance & jniEnvInstance, NWindows::NCOM::CPr
     case VT_I8:
         return LongToObject(jniEnvInstance, propVariant->hVal.QuadPart);
 
+    case VT_UI8:
+        return LongToObject(jniEnvInstance, propVariant->uhVal.QuadPart);
+
     case VT_UI1:
         return IntToObject(jniEnvInstance, propVariant->bVal);
 
@@ -299,9 +332,6 @@ jobject PropVariantToObject(JNIEnvInstance & jniEnvInstance, NWindows::NCOM::CPr
     case VT_UINT: // TODO Check this: Variant 'VT_UINT'
     case VT_UI4:
         return IntToObject(jniEnvInstance, propVariant->ulVal);
-
-    case VT_UI8:
-        return LongToObject(jniEnvInstance, propVariant->uhVal.QuadPart);
 
     case VT_BOOL:
         return BooleanToObject(jniEnvInstance, propVariant->boolVal);
