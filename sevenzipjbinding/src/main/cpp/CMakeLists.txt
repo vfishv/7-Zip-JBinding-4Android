@@ -7,6 +7,7 @@ PROJECT(SevenZipJBinding)
 # CXX="g++-4.2 -arch i386"
 
 SET(CMAKE_BUILD_TYPE Release CACHE STRING "Build target: Release or Debug")
+OPTION(STATIC_BUILD "links the dynamic library statically. Such library will not require dependencies on dynamic libraries at runtime" TRUE)
 
 SET(MINGW32     No CACHE BOOL "Use MinGW toolchain (32 bit)")
 SET(MINGW64     No CACHE BOOL "Use MinGW toolchain (64 bit)")
@@ -71,7 +72,7 @@ SET_PROPERTY(GLOBAL PROPERTY MINGW                 ${MINGW})
 SET_PROPERTY(GLOBAL PROPERTY WINDOWS               ${WINDOWS}) 
 
 FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/jbinding-java)
-IF(WINDOWS)
+if("${CMAKE_HOST_SYSTEM}" MATCHES ".*Windows.*")
     SET(PATH_SEP ";")
 ELSE()
     SET(PATH_SEP ":")
