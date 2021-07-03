@@ -20,31 +20,24 @@ All features of [7-Zip-JBinding](http://sevenzipjbind.sourceforge.net/) supporte
 7-Zip was created by Igor Pavlov ([7-Zip Web Site](https://www.7-zip.org/links.html)), with 7-Zip-JBinding initially designed and implemented by Boris Brodski ([7-Zip-JBinding Web Site](http://sevenzipjbind.sourceforge.net/)). 7-Zip-JBinding was adapted for Android by Fredrik Claesson.
 
 ## Usage
-1. Check out a local copy of [7-Zip-JBinding-4Android](https://github.com/omicronapps/7-Zip-JBinding-4Android) repository
-2. Select 'release' build variant and make project (optionally 'debug' build variant for debugging 7-Zip-JBinding)
-3. Copy AAR library (`sevenzipjbinding-release.aar`) from `sevenzipjbinding/build/outputs/aar/` to the application level `libs` folder (example: `MyAndroidProject/app/libs/`)
-4. Add local 'libs' directory as repository to project level `build.gradle` file (example: `MyAndroidProject/build.gradle`)
+7-Zip-JBinding-4Android is currently not available on JCenter due to package name conflict with the 7-Zip-JBinding JAR library. However, it is possible to import the AAR library in Gradle from the JitPack repository.
+1. Add the JitPack repository to project level `build.gradle` file (example: `MyAndroidProject/build.gradle`)
 ```
 allprojects {
     repositories {
-...
-        flatDir {
-            dirs 'libs'
-        }
-...
+        ...
+        maven { url 'https://jitpack.io' }
     }
 }
 ```
-5. Add AAR dependency to application level `build.gradle` file (example: `MyAndroidProject/app/build.gradle`)
+2. Add dependency to application level `build.gradle` file (example: `MyAndroidProject/app/build.gradle`)
 ```
 dependencies {
-...
-    compile(name:'sevenzipjbinding-release', ext:'aar')
-...
+    implementation 'com.github.omicronapps:7-Zip-JBinding-4Android:Release-16.02-2.02'
 }
 ```
-6. Sync project
-7. SevenZip should now be possible to use by importing `net.sf.sevenzipjbinding.SevenZip`
+3. Sync project
+4. SevenZip should now be possible to use by importing `net.sf.sevenzipjbinding.SevenZip`
 
 ## Examples
 Examples of opening an existing archive, along with listing and extracting the contents are provided below.
@@ -310,6 +303,10 @@ public class TestSlowExtract {
 ```
 
 ## Release Notes
+Main features of 16.02-2.02 (Release, cross-platform, based on zip/p7zip 16.02)
+* Bugfix #5 RandomAccessFileOutStream should implement Closeable
+  - (https://github.com/borisbrodski/sevenzipjbinding/issues/5)
+
 Main features of 16.02-2.01 (Release, extraction/compression/update, cross-platform, based on zip/p7zip 16.02)
 * Bind 7-Zip 16.02, In-memory archive extraction/creation/update
 * Extraction of
@@ -339,7 +336,7 @@ Main features of 9.20-2.00beta (Release candidate, extraction/compression/update
 * Compression & update of
   - 7z, Zip, Tar, GZip, BZip2
   - Archive format specific or generic compression API
-* JavaDoc + Snippets (see documentation on the web: [sevenzipjbind.sf.net](sevenzipjbind.sf.net))
+* JavaDoc + Snippets (see documentation on the web: [sevenzipjbind.sf.net](http://sevenzipjbind.sf.net))
 * 6766 JUnit tests:
   - 7z, Zip, Tar, Rar, Lzma, Iso, GZip, Cpio, BZIP2,
     Z, Arj, Lzh, Cab, Chm, Nsis, DEB, RPM, UDF

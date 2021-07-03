@@ -1,6 +1,26 @@
 7-Zip-JBinding ChangeLog
 ========================
 
+Release - 16.02-2.02 (Release, cross-platform, based on zip/p7zip 16.02)
+
+	* Bugfix #5 RandomAccessFileOutStream should implement Closeable
+		(https://github.com/borisbrodski/sevenzipjbinding/issues/5)
+
+
+Release - 16.02-2.01 (Release, cross-platform, based on zip/p7zip 16.02)
+
+	* Bugfix: Fix crash on read errors caused by wrong throw()
+		RAR and maybe other archive formats were affected by the bug.
+		Java exception from a data reading method could have caused a JVM crash.
+
+	* CMake: new option: STATIC_BUILD
+		STATIC_BUILD - links the dynamic library statically.
+		Such library will not require dependencies on dynamic
+		libraries at runtime
+	
+	* CMake: Enable build on NetBSD
+		Add NetBSD specific include path
+
 Release - 16.02-2.01 (Release, cross-platform, based on zip/p7zip 16.02)
 
 	* First official stable release
@@ -45,6 +65,9 @@ Release - 16.02-2.01 (Release, cross-platform, based on zip/p7zip 16.02)
 	* Bugfix: Bug #18 (null as password causes JVM crash)
 
 	* Complete rewrite of the test framework
+
+	* Drop support for the Mac 32bit and consequently for the AllMac packages
+	  (use Mac-x86_64 or AllPlatform instead)
 
 Release - 9.20-2.00beta (Release candidate, cross-platform, based on zip/p7zip 9.20 beta)
 
