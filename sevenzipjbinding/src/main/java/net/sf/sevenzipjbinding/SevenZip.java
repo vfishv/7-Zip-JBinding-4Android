@@ -193,7 +193,7 @@ public class SevenZip {
     }
 
     // Also change in /CMakeLists.txt
-    private static final String SEVENZIPJBINDING_VERSION = "16.02-2.02";
+    private static final String SEVENZIPJBINDING_VERSION = "16.02-2.03";
 
     private static final String SYSTEM_PROPERTY_TMP = "java.io.tmpdir";
     private static final String SYSTEM_PROPERTY_SEVEN_ZIP_NO_DO_PRIVILEGED_INITIALIZATION = "sevenzip.no_doprivileged_initialization";
@@ -212,7 +212,7 @@ public class SevenZip {
                     "Manifest-Version: 1.0\n" +
                     "Implementation-Vendor: sevenzipjbind.sf.net\n" +
                     "Implementation-Title: 7-Zip-JBinding native lib (Linux-arm)\n" +
-                    "Implementation-Version: 16.02-2.02\n" +
+                    "Implementation-Version: 16.02-2.03\n" +
                     "Built-By: Boris Brodski\n" +
                     "CMake: 3.3.2\n" +
                     "Created-By: 1.6.0_33-b03 (Sun Microsystems Inc.)\n" +
@@ -665,7 +665,7 @@ public class SevenZip {
     private static String byteArrayToHex(byte[] byteArray) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < byteArray.length; i++) {
-            stringBuilder.append(Integer.toHexString(0xFF & byteArray[i]));
+            stringBuilder.append(String.format("%1$02x", 0xFF & byteArray[i]));
         }
         return stringBuilder.toString();
     }

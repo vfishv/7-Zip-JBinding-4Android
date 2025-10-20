@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.10)
 
 project(SevenZipJBinding)
 set(TARGET 7-Zip-JBinding)
@@ -363,4 +363,6 @@ find_library(LOG-LIB
 set_target_properties(${TARGET} PROPERTIES LINK_FLAGS "-Wl,-z,defs -Wl,--no-undefined")
 target_link_libraries(${TARGET}
         ${LOG-LIB})
+
 target_link_options(${TARGET} PRIVATE "-Wl,-z,max-page-size=16384")
+target_link_options(${TARGET} PRIVATE "-Wl,-z,common-page-size=16384")
